@@ -1,6 +1,8 @@
 package live.mukeshtechlab.userservice;
 
 import live.mukeshtechlab.userservice.controllers.UserController;
+import live.mukeshtechlab.userservice.dtos.LoginRequestDto;
+import live.mukeshtechlab.userservice.dtos.LoginResponseDto;
 import live.mukeshtechlab.userservice.dtos.SignUpRequestDto;
 import live.mukeshtechlab.userservice.dtos.UserDto;
 import org.junit.jupiter.api.Test;
@@ -25,5 +27,16 @@ public class UserControllerTests {
 
         System.out.println("Name: " + userDto.getName());
         System.out.println("Email: " + userDto.getEmail());
+    }
+
+    @Test
+    public void testLogin(){
+        LoginRequestDto loginRequestDto = new LoginRequestDto();
+        loginRequestDto.setEmail("mukesh@abc.com");
+        loginRequestDto.setPassword("12345");
+
+        LoginResponseDto loginResponseDto = userController.login(loginRequestDto);
+        System.out.println("Token: " + loginResponseDto.getToken());
+        System.out.println("ResponseStatus: " + loginResponseDto.getStatus());
     }
 }
