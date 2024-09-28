@@ -1,12 +1,11 @@
 package live.mukeshtechlab.userservice.controllers;
 
 import live.mukeshtechlab.userservice.dtos.*;
+import live.mukeshtechlab.userservice.dtos.ResponseStatus;
 import live.mukeshtechlab.userservice.models.Token;
 import live.mukeshtechlab.userservice.models.User;
 import live.mukeshtechlab.userservice.services.UserService;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -17,6 +16,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PostMapping("/signup")
     public UserDto signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
 
         User user = userService.singUp(
@@ -28,6 +28,7 @@ public class UserController {
 
     }
 
+    @PostMapping("/login")
     public LoginResponseDto login(@RequestBody LoginRequestDto loginRequestDto) {
         LoginResponseDto loginResponseDto = new LoginResponseDto();
         try {
@@ -42,10 +43,12 @@ public class UserController {
         return loginResponseDto;
     }
 
+    @GetMapping("/validate")
     private UserDto validateToken(String token) {
         return null;
     }
 
+    @PostMapping("/logout")
     public LogoutResponseDto logout(@RequestBody LogoutRequestDto logoutRequestDto) {
         return null;
     }
