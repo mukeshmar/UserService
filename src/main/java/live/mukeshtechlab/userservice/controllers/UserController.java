@@ -43,14 +43,15 @@ public class UserController {
         return loginResponseDto;
     }
 
-    @GetMapping("/validate")
-    private UserDto validateToken(String token) {
-        return null;
+    @GetMapping("/validate/{token}")
+    private UserDto validateToken(@PathVariable("token") String token) {
+        User user = userService.validateToken(token);
+        return UserDto.from(user);
     }
 
-    @PostMapping("/logout")
-    public LogoutResponseDto logout(@RequestBody LogoutRequestDto logoutRequestDto) {
-        return null;
+    @PatchMapping("/logout")
+    public void logout(@RequestBody LogoutRequestDto logoutRequestDto) {
+        userService.logout(logoutRequestDto.getToken());
     }
 
 }

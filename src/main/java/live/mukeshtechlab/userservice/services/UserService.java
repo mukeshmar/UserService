@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-    private final TokenRepository tokenRepository;
+    private TokenRepository tokenRepository;
     private UserRepository userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -55,11 +55,35 @@ public class UserService {
     }
 
     public User validateToken(String token) {
-        return null;
+        // Check if the token is valid
+        Optional<Token> tokenOptional = tokenRepository.findByValueAndDeletedAndExpiryAtGreaterThan(
+                token,
+                false,
+                new Date()
+        );
+
+        if (tokenOptional.isEmpty()) {
+            return null;
+        }
+
+        return tokenOptional.get().getUser();
     }
 
     public void logout(String token) {
+        // Check if the token is valid or not
+        Optional<Token> tokenOptional = tokenRepository.findByValueAndDeletedAndExpiryAtGreaterThan(
+                token,
+                false,
+                new Date()
+        );
 
+        if (tokenOptional.isEmpty()) {
+            // Invalid token
+            return;
+        }
+        Token tokenFromDB = tokenOptional.get();
+        tokenFromDB.setDeleted(true);
+        tokenRepository.save(tokenFromDB);
     }
 
     private Token createToken(User user) {
