@@ -1,10 +1,14 @@
 package live.mukeshtechlab.userservice.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import live.mukeshtechlab.userservice.dtos.SendEmailDto;
 import live.mukeshtechlab.userservice.models.Token;
 import live.mukeshtechlab.userservice.models.User;
 import live.mukeshtechlab.userservice.repositories.TokenRepository;
 import live.mukeshtechlab.userservice.repositories.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,21 +23,46 @@ public class UserService {
     private TokenRepository tokenRepository;
     private UserRepository userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private KafkaTemplate<String, String> kafkaTemplate;
+    private ObjectMapper objectMapper;
 
     public UserService(
             UserRepository userRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
-            TokenRepository tokenRepository) {
+            TokenRepository tokenRepository,
+            KafkaTemplate<String, String> kafkaTemplate,
+            ObjectMapper objectMapper
+    ) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.tokenRepository = tokenRepository;
+        this.kafkaTemplate = kafkaTemplate;
+        this.objectMapper = objectMapper;
     }
 
     public User singUp(String name, String email, String password) {
         User user = new User();
         user.setName(name);
         user.setEmail(email);
+        //First encrypt the password using BCrypt Algorithm before storing into the DB.
         user.setHashedPassword(bCryptPasswordEncoder.encode(password));
+
+        // Push sendEmail event to Kafka for sending welcome emails to users
+
+        SendEmailDto sendEmailDto = new SendEmailDto();
+        sendEmailDto.setTo(email);
+        sendEmailDto.setSubject("Welcome to the Family!");
+        sendEmailDto.setBody("Your account has been successfully created, and you can now take advantage of all the features we offer");
+
+        try {
+            System.out.println("Pushing the event inside Kafka.");
+            kafkaTemplate.send("sendEmail", objectMapper.writeValueAsString(sendEmailDto));
+        }
+        catch (JsonProcessingException exception){
+            throw new RuntimeException(exception);
+        }
+
+        // Now Return
         return userRepository.save(user);
     }
 
