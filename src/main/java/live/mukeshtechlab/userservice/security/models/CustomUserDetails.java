@@ -1,0 +1,76 @@
+package live.mukeshtechlab.userservice.security.models;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import live.mukeshtechlab.userservice.models.Role;
+import live.mukeshtechlab.userservice.models.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+@JsonDeserialize
+public class CustomUserDetails implements UserDetails {
+
+    private String username;
+    private String password;
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+    private boolean enabled;
+    private List<GrantedAuthority> authorities = new ArrayList<>();
+
+    // Default Constructor
+    public CustomUserDetails() { }
+
+    // Create from User
+    public CustomUserDetails(User user) {
+        this.username = user.getEmail(); // Changed to username
+        this.password = user.getHashedPassword();
+        this.accountNonExpired = true;
+        this.accountNonLocked = true;
+        this.credentialsNonExpired = true;
+        this.enabled = true;
+
+        // Roles to GrantedAuthority
+        for (Role role : user.getRoles()) {
+            this.authorities.add(new CustomGrantedAuthority(role));
+        }
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.username; // Changed to username
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return this.accountNonExpired;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.accountNonLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return this.credentialsNonExpired;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+}

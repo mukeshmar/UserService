@@ -47,20 +47,20 @@ public class UserService {
         //First encrypt the password using BCrypt Algorithm before storing into the DB.
         user.setHashedPassword(bCryptPasswordEncoder.encode(password));
 
-        // Push sendEmail event to Kafka for sending welcome emails to users
-
-        SendEmailDto sendEmailDto = new SendEmailDto();
-        sendEmailDto.setTo(email);
-        sendEmailDto.setSubject("Welcome to the Family!");
-        sendEmailDto.setBody("Your account has been successfully created, and you can now take advantage of all the features we offer");
-
-        try {
-            System.out.println("Pushing the event inside Kafka.");
-            kafkaTemplate.send("sendEmail", objectMapper.writeValueAsString(sendEmailDto));
-        }
-        catch (JsonProcessingException exception){
-            throw new RuntimeException(exception);
-        }
+//        // Push sendEmail event to Kafka for sending welcome emails to users
+//
+//        SendEmailDto sendEmailDto = new SendEmailDto();
+//        sendEmailDto.setTo(email);
+//        sendEmailDto.setSubject("Welcome to the Family!");
+//        sendEmailDto.setBody("Your account has been successfully created, and you can now take advantage of all the features we offer");
+//
+//        try {
+//            System.out.println("Pushing the event inside Kafka.");
+//            kafkaTemplate.send("sendEmail", objectMapper.writeValueAsString(sendEmailDto));
+//        }
+//        catch (JsonProcessingException exception){
+//            throw new RuntimeException(exception);
+//        }
 
         // Now Return
         return userRepository.save(user);

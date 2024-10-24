@@ -32,8 +32,9 @@ class UserServiceApplicationTests {
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .redirectUri("https://oauth.pstmn.io/v1/callback")
                 .postLogoutRedirectUri("https://oauth.pstmn.io/v1/callback")
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
+//                .scope(OidcScopes.OPENID)
+//                .scope(OidcScopes.PROFILE)
+                .scope("profile")
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
                 .build();
         jpaRegisteredClientRepository.save(oidcClient);
